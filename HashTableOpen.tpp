@@ -1,6 +1,10 @@
 template <typename Key, typename Val>
 HashTableOpen<Key, Val>::HashTableOpen(int i) {
-    // TODO
+    M = i;
+    ht = new LinkedList<Record>*[M];
+    for (int j = 0; j < M; j++) {
+        ht[j] = new LinkedList<Record>;
+    }
 }
 
 template <typename Key, typename Val>
@@ -21,7 +25,10 @@ HashTableOpen<Key, Val>& HashTableOpen<Key, Val>::operator=
 
 template <typename Key, typename Val>
 HashTableOpen<Key, Val>::~HashTableOpen() {
-    // TODO
+    for (int i = 0; i < M; i++) {
+        delete ht[i];
+    }
+    delete[] ht;
 }
 
 template <typename Key, typename Val>
@@ -99,7 +106,15 @@ void HashTableOpen<Key, Val>::copy(const HashTableOpen<Key, Val>& copyObj) {
 
 template <typename Key, typename Val>
 Val HashTableOpen<Key, Val>::find(const Key& k) const {
-    // TODO
+    int slot = hash(k);
+    LinkedList<Record>* list = ht[slot];
+    for (int i = 0; i < list->getLength(); i++) {
+        Record r = list->getElement(i);
+        if (r.k == k) {
+            return r.v;
+        }
+    }
+    throw string("Key not found");
 }
 
 template <typename Key, typename Val>
@@ -152,15 +167,33 @@ int HashTableOpen<Key, Val>::hash(const Key& k) const {
 
 template <typename Key, typename Val>
 void HashTableOpen<Key, Val>::insert(const Key& k, const Val& v) {
-    // TODO
+    int slot = hash(k);
+    LinkedList<Record>* list = ht[slot];
+    if (list->isEmpty()) {
+        list->append(Record(k, v));
+    } else {
+        list->insert(0, Record(k, v));
+    }
 }
 
 template <typename Key, typename Val>
 void HashTableOpen<Key, Val>::remove(const Key& k) {
-    // TODO
+    int slot = hash(k);
+    LinkedList<Record>* list = ht[slot];
+    for (int i = 0; i < list->getLength(); i++) {
+        if (list->getElement(i).k == k) {
+            list->remove(i);
+            return;
+        }
+    }
+    throw string("Key not found");
 }
 
 template <typename Key, typename Val>
 int HashTableOpen<Key, Val>::size() const {
-    // TODO
+    int count = 0;
+    for (int i = 0; i < M; i++) {
+        count += ht[i]->getLength();
+    }
+    return count;
 }
